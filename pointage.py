@@ -166,8 +166,7 @@ df_janvier = df[df['Date et heure'].dt.month == 1]
 
 # Nombre total de pointages par jour
 st.header("Nombre total de pointages par jour")
-df_mois = df_janvier.groupby('Date et heure')
-df_mois = pd.to_datetime(df['Date et heure']).dt.date
+df_mois = pd.to_datetime(df_janvier['Date et heure']).dt.date
 pointages_par_jour = df_mois.groupby('Date et heure').size()
 st.bar_chart(pointages_par_jour)
 
