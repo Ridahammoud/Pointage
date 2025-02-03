@@ -117,8 +117,9 @@ if uploaded_file is not None:
         df_with_entry_exit = create_entry_exit_columns(df)
 
         # Afficher les opérateurs avec leurs entrées/sorties
+        result = get_entry_exit_times(df)
         st.subheader("Opérateurs avec entrées/sorties")
-        st.write(df_with_entry_exit)
+        st.write(result)
 
         # Calculer la durée de travail pour chaque opérateur (en minutes)
         def calculer_duree_travail(entree, sortie):
