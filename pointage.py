@@ -103,7 +103,7 @@ if uploaded_file is not None:
             fin = pd.to_datetime(sortie)
             if fin < debut:  # Si la sortie est après minuit (le lendemain)
                 fin += timedelta(days=1)
-            duree = (fin - debut).total_seconds() / 60  # Durée en minutes
+            duree = (fin - debut)  # Durée 
             return duree
 
         df_with_entry_exit['Durée (minutes)'] = df_with_entry_exit.apply(
@@ -138,14 +138,6 @@ with col2:
         
 # Filtrer les données pour janvier 2025
 df_janvier = df[df['Date et heure'].dt.month == 1]
-
-# Calcul de la durée de travail
-st.header("Durée de travail")
-df_exit['Durée (minutes)'] = df_exit.apply(
-    lambda row: calculer_duree_travail(row['Date et heure_entree'], row['Date et heure_sortie']), 
-    axis=1
-)
-st.write(df_exit[['Prénom et nom', 'Date et heure_entree', 'Date et heure_sortie', 'Durée (minutes)']])
 
 # Nombre total de pointages par jour
 st.header("Nombre total de pointages par jour")
