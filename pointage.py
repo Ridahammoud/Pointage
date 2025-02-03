@@ -73,6 +73,31 @@ def create_entry_exit_columns(df):
     }).reset_index()
 
     return df_grouped
+
+def get_entry_exit_times(df):
+    # Trier le DataFrame par employé et date/heure
+    df = df.sort_values(['Prénom et nom', 'Date et heure'])
+    
+    # Initialiser les listes pour stocker les résultats
+    entries = []
+    exits = []
+    
+    for name, group in df.groupby('Prénom et nom'):
+        entry_time = None
+        for _, row in group.iterrows():
+            if row['Action'] == 'Pointer entrée' and entry_time is None:
+                entry_time = row['Date et heure']
+            elif row['Action'] == 'Pointer sortie' and entry_time is not None:
+                exit_time = row['Date et heure']
+                if exit_time - entry_time <= timedelta(days=1):
+                    entries.append(entry_time)
+                    exits.append(exit_time)
+                    entry_time = None
+                else:
+                    # Si la sortie est plus d'un jour après l'entrée, on l'ignore
+                    entry_time = None
+    
+    return pd.DataFrame({'Entrée': entries, 'Sortie': exits})
                        
 # Dans la partie principale de votre application Streamlit
 st.title("Analyse des pointages")
@@ -106,7 +131,7 @@ if uploaded_file is not None:
             duree = (fin - debut).total_seconds() / 3600  # Durée en heures
             return round(duree, 2) # arrondir à 2 chiffres après la virgule
 
-        df_with_entry_exit['Durée (minutes)'] = df_with_entry_exit.apply(
+        df_with_entry_exit['Durée (heures)'] = df_with_entry_exit.apply(
             lambda row: calculer_duree_travail(row['Date et heure_entree'], row['Date et heure_sortie']),
             axis=1,
         )
@@ -148,6 +173,9 @@ st.bar_chart(pointages_par_jour)
 st.header("Taux de succès")
 taux_succes = (df_janvier['Statut'] == 'Succès').mean() * 100
 st.metric("Taux de succès", f"{taux_succes:.2f}%")
+
+result = get_entry_exit_times(df)
+print(result)
 
 # Observations particulières
 st.header("Observations particulières")
