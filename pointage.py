@@ -19,11 +19,31 @@ def calculer_duree_travail(entree, sortie):
 @st.cache_data
 def load_data(uploaded_file):
     if uploaded_file is not None:
-        # Lire le fichier Excel
-        df = pd.read_excel(uploaded_file, parse_dates=['Date et heure'])
-        df['Date'] = df['Date et heure'].dt.date
-        return df
-    return None
+        try:
+            # Charger le fichier Excel
+            df = pd.read_excel(uploaded_file)
+            
+            # Vérifier si la colonne "Date et heure" existe
+            if 'Date et heure' not in df.columns:
+                st.error("Le fichier ne contient pas de colonne 'Date et heure'.")
+                return None
+            
+            # Convertir la colonne "Date et heure" en type datetime
+            df['Date et heure'] = pd.to_datetime(df['Date et heure'], errors='coerce')
+            
+            # Vérifier les valeurs non converties (NaT)
+            if df['Date et heure'].isna().any():
+                st.warning("Certaines valeurs dans la colonne 'Date et heure' n'ont pas pu être converties.")
+            
+            # Ajouter une colonne "Date" pour simplifier les analyses par jour
+            df['Date'] = df['Date et heure'].dt.date
+            
+            return df
+        except Exception as e:
+            st.error(f"Erreur lors du chargement des données : {e}")
+            return None
+    else:
+        return None
 
 # Dans la partie principale de votre application Streamlit
 st.title("Analyse des pointages")
@@ -31,8 +51,12 @@ st.title("Analyse des pointages")
 # Ajouter un widget pour télécharger le fichier Excel
 uploaded_file = st.file_uploader("Choisissez un fichier Excel", type="xlsx")
 
-df = load_data(uploaded_file)
-
+if uploaded_file is not None:
+    df = load_data(uploaded_file)
+    
+    if df is not None:
+        st.success("Données chargées avec succès !")
+        
 st.title("Analyse des pointages - Janvier 2025")
 
 # Filtrer les données pour janvier 2025
