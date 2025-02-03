@@ -104,7 +104,7 @@ st.title("Analyse des pointages")
 
 # Ajouter un widget pour télécharger le fichier Excel
 uploaded_file = st.file_uploader("Choisissez un fichier Excel", type="xlsx")
-
+df = load_data(uploaded_file)
 
 if uploaded_file is not None:
     # Charger les données depuis le fichier téléchargé
