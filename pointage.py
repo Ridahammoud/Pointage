@@ -103,8 +103,8 @@ if uploaded_file is not None:
             fin = pd.to_datetime(sortie)
             if fin < debut:  # Si la sortie est après minuit (le lendemain)
                 fin += timedelta(days=1)
-            duree = (fin - debut)  # Durée 
-            return duree
+            duree = (fin - debut).total_seconds() / 3600  # Durée en heures
+            return round(duree, 2) # arrondir à 2 chiffres après la virgule
 
         df_with_entry_exit['Durée (minutes)'] = df_with_entry_exit.apply(
             lambda row: calculer_duree_travail(row['Date et heure_entree'], row['Date et heure_sortie']),
