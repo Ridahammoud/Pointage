@@ -141,7 +141,7 @@ df_janvier = df[df['Date et heure'].dt.month == 1]
 
 # Nombre total de pointages par jour
 st.header("Nombre total de pointages par jour")
-pointages_par_jour = df_janvier.groupby('Date').size()
+pointages_par_jour = df_janvier.groupby('Date et heure').size()
 st.bar_chart(pointages_par_jour)
 
 # Taux de succès
