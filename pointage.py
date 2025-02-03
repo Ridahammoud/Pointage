@@ -17,10 +17,33 @@ def calculer_duree_travail(entree, sortie):
 
 # Chargement des données
 @st.cache_data
-def load_data():
-    df = pd.read_csv('donnees_pointage.csv', parse_dates=['Date et heure'])
-    df['Date'] = df['Date et heure'].dt.date
-    return df
+def load_data(uploaded_file):
+    if uploaded_file is not None:
+        try:
+            # Charger le fichier Excel
+            df = pd.read_excel(uploaded_file)
+            
+            # Vérifier si la colonne "Date et heure" existe
+            if 'Date et heure' not in df.columns:
+                st.error("Le fichier ne contient pas de colonne 'Date et heure'.")
+                return None
+            
+            # Convertir la colonne "Date et heure" en type datetime
+            df['Date et heure'] = pd.to_datetime(df['Date et heure'], errors='coerce')
+            
+            # Vérifier les valeurs non converties (NaT)
+            if df['Date et heure'].isna().any():
+                st.warning("Certaines valeurs dans la colonne 'Date et heure' n'ont pas pu être converties.")
+            
+            # Ajouter une colonne "Date" pour simplifier les analyses par jour
+            df['Date'] = df['Date et heure'].dt.date
+            
+            return df
+        except Exception as e:
+            st.error(f"Erreur lors du chargement des données : {e}")
+            return None
+    else:
+        return None
 
 def get_correct_and_incorrect_pointages(df):
     entrees = df[df['Action'] == 'Pointer entrée'].groupby('Prénom et nom').last()
