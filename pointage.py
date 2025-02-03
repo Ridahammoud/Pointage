@@ -12,7 +12,7 @@ def calculer_duree_travail(entree, sortie):
     fin = datetime.strptime(sortie, "%Y-%m-%d %H:%M")
     if fin < debut:
         fin += timedelta(days=1)
-    duree = (fin - debut).total_seconds() / 60
+    duree = (fin - debut)
     return duree
 
 # Chargement des données
