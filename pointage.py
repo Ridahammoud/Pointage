@@ -83,7 +83,7 @@ st.title("Analyse des pointages")
 uploaded_file = st.file_uploader("Choisissez un fichier Excel", type="xlsx")
 
 # Après avoir chargé vos données dans df, appelez cette fonction :
-df = create_entry_exit_columns(df)
+df_exit = create_entry_exit_columns(df)
 
 if uploaded_file is not None:
     df = load_data(uploaded_file)
@@ -112,11 +112,11 @@ df_janvier = df[df['Date et heure'].dt.month == 1]
 
 # Calcul de la durée de travail
 st.header("Durée de travail")
-df['Durée (minutes)'] = df.apply(
+df_exit['Durée (minutes)'] = df_exit.apply(
     lambda row: calculer_duree_travail(row['Date et heure_entree'], row['Date et heure_sortie']), 
     axis=1
 )
-st.write(df[['Prénom et nom', 'Date et heure_entree', 'Date et heure_sortie', 'Durée (minutes)']])
+st.write(df_exit[['Prénom et nom', 'Date et heure_entree', 'Date et heure_sortie', 'Durée (minutes)']])
 
 # Nombre total de pointages par jour
 st.header("Nombre total de pointages par jour")
