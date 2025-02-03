@@ -20,8 +20,8 @@ def calculer_duree_travail(entree, sortie):
 def load_data(uploaded_file):
     if uploaded_file is not None:
         try:
-            # Charger le fichier Excel
-            df = pd.read_excel(uploaded_file)
+            # Charger le fichier Excel ou CSV
+            df = pd.read_excel(uploaded_file) if uploaded_file.name.endswith('.xlsx') else pd.read_csv(uploaded_file)
             
             # Vérifier si la colonne "Date et heure" existe
             if 'Date et heure' not in df.columns:
@@ -34,9 +34,6 @@ def load_data(uploaded_file):
             # Vérifier les valeurs non converties (NaT)
             if df['Date et heure'].isna().any():
                 st.warning("Certaines valeurs dans la colonne 'Date et heure' n'ont pas pu être converties.")
-            
-            # Ajouter une colonne "Date" pour simplifier les analyses par jour
-            df['Date'] = df['Date et heure'].dt.date
             
             return df
         except Exception as e:
@@ -55,25 +52,26 @@ def get_correct_and_incorrect_pointages(df):
     
     return list(operateurs_corrects), list(operateurs_incorrects)
 
+# Fonction pour créer les colonnes 'Date et heure_entree' et 'Date et heure_sortie'
 def create_entry_exit_columns(df):
     # Créer des colonnes vides pour l'entrée et la sortie
     df['Date et heure_entree'] = pd.NaT
     df['Date et heure_sortie'] = pd.NaT
-    
+
     # Remplir les colonnes en fonction de l'action
     mask_entree = df['Action'] == 'Pointer entrée'
     mask_sortie = df['Action'] == 'Pointer sortie'
-    
+
     df.loc[mask_entree, 'Date et heure_entree'] = df.loc[mask_entree, 'Date et heure']
     df.loc[mask_sortie, 'Date et heure_sortie'] = df.loc[mask_sortie, 'Date et heure']
-    
+
     # Grouper par 'Prénom et nom' pour avoir une ligne par personne avec entrée et sortie
     df_grouped = df.groupby('Prénom et nom').agg({
-        'Date et heure_entree': 'first',
-        'Date et heure_sortie': 'last',
-        'PIN': 'first'  # Garder le PIN de l'employé
+        'Date et heure_entree': 'first',  # Première entrée enregistrée
+        'Date et heure_sortie': 'last',  # Dernière sortie enregistrée
+        'PIN': 'first'  # Conserver le PIN de l'employé
     }).reset_index()
-    
+
     return df_grouped
                        
 # Dans la partie principale de votre application Streamlit
