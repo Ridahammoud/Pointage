@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
+import io
 
 # Fonction pour calculer la durée de travail
 def calculer_duree_travail(entree, sortie):
@@ -16,12 +17,21 @@ def calculer_duree_travail(entree, sortie):
 
 # Chargement des données
 @st.cache_data
-def load_data():
-    df = pd.read_csv('donnees_pointage.csv', parse_dates=['Date et heure'])
-    df['Date'] = df['Date et heure'].dt.date
-    return df
+def load_data(uploaded_file):
+    if uploaded_file is not None:
+        # Lire le fichier Excel
+        df = pd.read_excel(uploaded_file, parse_dates=['Date et heure'])
+        df['Date'] = df['Date et heure'].dt.date
+        return df
+    return None
 
-df = load_data()
+# Dans la partie principale de votre application Streamlit
+st.title("Analyse des pointages")
+
+# Ajouter un widget pour télécharger le fichier Excel
+uploaded_file = st.file_uploader("Choisissez un fichier Excel", type="xlsx")
+
+df = load_data(uploaded_file)
 
 st.title("Analyse des pointages - Janvier 2025")
 
