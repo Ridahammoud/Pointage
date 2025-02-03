@@ -138,7 +138,7 @@ if uploaded_file is not None:
 
         # Afficher les durées calculées
         st.subheader("Durée de travail par opérateur")
-        st.write(df_with_entry_exit[['Prénom et nom', 'Date et heure_entree', 'Date et heure_sortie', 'Durée (minutes)']])
+        st.write(df_with_entry_exit[['Prénom et nom', 'Date et heure_entree', 'Date et heure_sortie', 'Durée (heures)']])
         
     else:
         st.error("Impossible de charger les données. Vérifiez le fichier.")
