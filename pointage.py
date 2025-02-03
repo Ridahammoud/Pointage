@@ -80,14 +80,45 @@ st.title("Analyse des pointages")
 # Ajouter un widget pour télécharger le fichier Excel
 uploaded_file = st.file_uploader("Choisissez un fichier Excel", type="xlsx")
 
-# Après avoir chargé vos données dans df, appelez cette fonction :
-df_exit = create_entry_exit_columns(df)
 
 if uploaded_file is not None:
+    # Charger les données depuis le fichier téléchargé
     df = load_data(uploaded_file)
     
     if df is not None:
         st.success("Données chargées avec succès !")
+
+        # Créer les colonnes d'entrée/sortie
+        df_with_entry_exit = create_entry_exit_columns(df)
+
+        # Afficher les opérateurs avec leurs entrées/sorties
+        st.subheader("Opérateurs avec entrées/sorties")
+        st.write(df_with_entry_exit)
+
+        # Calculer la durée de travail pour chaque opérateur (en minutes)
+        def calculer_duree_travail(entree, sortie):
+            if pd.isnull(entree) or pd.isnull(sortie):
+                return None
+            debut = pd.to_datetime(entree)
+            fin = pd.to_datetime(sortie)
+            if fin < debut:  # Si la sortie est après minuit (le lendemain)
+                fin += timedelta(days=1)
+            duree = (fin - debut).total_seconds() / 60  # Durée en minutes
+            return duree
+
+        df_with_entry_exit['Durée (minutes)'] = df_with_entry_exit.apply(
+            lambda row: calculer_duree_travail(row['Date et heure_entree'], row['Date et heure_sortie']),
+            axis=1,
+        )
+
+        # Afficher les durées calculées
+        st.subheader("Durée de travail par opérateur")
+        st.write(df_with_entry_exit[['Prénom et nom', 'Date et heure_entree', 'Date et heure_sortie', 'Durée (minutes)']])
+        
+    else:
+        st.error("Impossible de charger les données. Vérifiez le fichier.")
+else:
+    st.info("Veuillez télécharger un fichier Excel ou CSV pour commencer l'analyse.")
         
 st.title("Analyse des pointages - Janvier 2025")
 
