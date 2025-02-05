@@ -127,28 +127,8 @@ if uploaded_file is not None:
 
         # Afficher les opérateurs avec leurs entrées/sorties
         result = get_entry_exit_times(df)
-        st.subheader("Opérateurs avec entrées/sorties")
+        st.subheader("Opérateurs avec entrées/sorties et durées correspondantes")
         st.write(result)
-
-        # Calculer la durée de travail pour chaque opérateur (en minutes)
-        def calculer_duree_travail(entree, sortie):
-            if pd.isnull(entree) or pd.isnull(sortie):
-                return None
-            debut = pd.to_datetime(entree)
-            fin = pd.to_datetime(sortie)
-            if fin < debut:  # Si la sortie est après minuit (le lendemain)
-                fin += timedelta(days=1)
-            duree = (fin - debut).total_seconds() / 3600  # Durée en heures
-            return round(duree, 2) # arrondir à 2 chiffres après la virgule
-
-        df_with_entry_exit['Durée (heures)'] = df_with_entry_exit.apply(
-            lambda row: calculer_duree_travail(row['Date et heure_entree'], row['Date et heure_sortie']),
-            axis=1,
-        )
-
-        # Afficher les durées calculées
-        st.subheader("Durée de travail par opérateur")
-        st.write(df_with_entry_exit[['Prénom et nom', 'Date et heure_entree', 'Date et heure_sortie', 'Durée (heures)']])
         
     else:
         st.error("Impossible de charger les données. Vérifiez le fichier.")
