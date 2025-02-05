@@ -160,7 +160,37 @@ df_janvier['Date'] = pd.to_datetime(df_janvier['Date et heure']).dt.date
 pointages_par_jour = df_janvier.groupby('Date').size()
 st.bar_chart(pointages_par_jour)
 
+# Calculer le taux de succès
+total_actions = len(df)
+actions_succes = len(df[df['Statut'] == 'Succès'])
+success_rate = (actions_succes / total_actions) * 100
+failure_rate = 100 - success_rate
 
+# Création du camembert 3D
+fig, ax = plt.subplots(figsize=(8, 6), subplot_kw=dict(projection='3d'))
+
+# Données pour le camembert
+sizes = [success_rate, failure_rate]
+labels = ['Succès', 'Échec']
+colors = ['#4CAF50', '#F44336']
+
+# Paramètres 3D
+def func(pct, allvalues):
+    absolute = int(pct/100.*sum(allvalues))
+    return f"{pct:.1f}%\n({absolute:d})"
+
+wedges, texts, autotexts = ax.pie(sizes, 
+                                  labels=labels, 
+                                  colors=colors, 
+                                  autopct=lambda pct: func(pct, sizes),
+                                  startangle=90,
+                                  wedgeprops=dict(width=0.5, edgecolor='white'))
+
+# Titre du graphique
+plt.title("Taux de succès des pointages (3D)", fontsize=15)
+
+# Affichage du camembert dans Streamlit
+st.pyplot(fig)
 
 # Taux de succès
 st.header("Taux de succès")
