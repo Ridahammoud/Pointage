@@ -82,6 +82,7 @@ def get_entry_exit_times(df):
     entries = []
     exits = []
     noms = []
+    durees = []
     
     for name, group in df.groupby('Prénom et nom'):
         entry_time = None
@@ -95,12 +96,17 @@ def get_entry_exit_times(df):
                     entries.append(entry_time)
                     exits.append(exit_time)
                     noms.append(prenom_nom)
+                    
+                    # Calculer la durée en heures
+                    duree = (exit_time - entry_time).total_seconds() / 3600
+                    durees.append(round(duree, 2))
+                    
                     entry_time = None
                 else:
                     # Si la sortie est plus d'un jour après l'entrée, on l'ignore
                     entry_time = None
     
-    return pd.DataFrame({'Prénom et nom': noms, 'Entrée': entries, 'Sortie': exits})
+    return pd.DataFrame({'Prénom et nom': noms,'Entrée': entries,'Sortie': exits,'Durée (heures)': durees})
                        
 # Dans la partie principale de votre application Streamlit
 st.title("Analyse des pointages")
