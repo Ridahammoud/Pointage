@@ -1,4 +1,9 @@
 streamlit
 pandas
-matplotlib
+numpy
+datetime
+plotly.express
 openpyxl
+reportlab
+xlsxwriter
+plotly
