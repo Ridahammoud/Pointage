@@ -81,23 +81,27 @@ def get_entry_exit_times(df):
     # Initialiser les listes pour stocker les résultats
     entries = []
     exits = []
+    nom = []
     
     for name, group in df.groupby('Prénom et nom'):
         entry_time = None
         for _, row in group.iterrows():
             if row['Action'] == 'Pointer entrée' and entry_time is None:
                 entry_time = row['Date et heure']
+                prenom_nom = row['Prénom et nom']
             elif row['Action'] == 'Pointer sortie' and entry_time is not None:
                 exit_time = row['Date et heure']
+                prenom_nom = row['Prénom et nom']
                 if exit_time - entry_time <= timedelta(days=1):
                     entries.append(entry_time)
                     exits.append(exit_time)
+                    nom.append(penom_nom)
                     entry_time = None
                 else:
                     # Si la sortie est plus d'un jour après l'entrée, on l'ignore
                     entry_time = None
     
-    return pd.DataFrame({'Entrée': entries, 'Sortie': exits})
+    return pd.DataFrame({'Prénom et nom':nom ,'Entrée': entries, 'Sortie': exits})
                        
 # Dans la partie principale de votre application Streamlit
 st.title("Analyse des pointages")
