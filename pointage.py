@@ -160,10 +160,28 @@ df_janvier['Date'] = pd.to_datetime(df_janvier['Date et heure']).dt.date
 pointages_par_jour = df_janvier.groupby('Date').size()
 st.bar_chart(pointages_par_jour)
 
+
+
 # Taux de succès
 st.header("Taux de succès")
 taux_succes = (df_janvier['Statut'] == 'Succès').mean() * 100
-st.metric("Taux de succès", f"{taux_succes:.2f}%")
+# Données du taux de succès
+success_rate = taux_succes
+failure_rate = 100 - success_rate
+
+# Création du camembert
+fig, ax = plt.subplots()
+sizes = [success_rate, failure_rate]
+labels = ['Succès', 'Échec']
+colors = ['#4CAF50', '#F44336']
+ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
+ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle
+
+# Titre du graphique
+plt.title("Taux de succès des pointages")
+
+# Affichage du camembert dans Streamlit
+st.pyplot(fig)
 
 result = get_entry_exit_times(df)
 print(result)
