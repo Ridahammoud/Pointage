@@ -169,33 +169,6 @@ failure_rate = 100 - success_rate
 # Création du camembert 3D
 fig, ax = plt.subplots(figsize=(8, 6), subplot_kw=dict(projection='3d'))
 
-# Données pour le camembert
-
-labels = ['Succès', 'Échec']
-colors = ['#4CAF50', '#F44336']
-taux_succes = (df_janvier['Statut'] == 'Succès').mean() * 100
-success_rate = taux_succes
-failure_rate = 100 - success_rate
-sizes = [success_rate, failure_rate]
-
-# Paramètres 3D
-def func(pct, allvalues):
-    absolute = int(pct/100.*sum(allvalues))
-    return f"{pct:.1f}%\n({absolute:d})"
-
-wedges, texts, autotexts = ax.pie(sizes, 
-                                  labels=labels, 
-                                  colors=colors, 
-                                  autopct=lambda pct: func(pct, sizes),
-                                  startangle=90,
-                                  wedgeprops=dict(width=0.5, edgecolor='white'))
-
-# Titre du graphique
-plt.title("Taux de succès des pointages (3D)", fontsize=15)
-
-# Affichage du camembert dans Streamlit
-st.pyplot(fig)
-
 # Taux de succès
 st.header("Taux de succès")
 taux_succes = (df_janvier['Statut'] == 'Succès').mean() * 100
