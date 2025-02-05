@@ -170,9 +170,13 @@ failure_rate = 100 - success_rate
 fig, ax = plt.subplots(figsize=(8, 6), subplot_kw=dict(projection='3d'))
 
 # Données pour le camembert
-sizes = [success_rate, failure_rate]
+
 labels = ['Succès', 'Échec']
 colors = ['#4CAF50', '#F44336']
+taux_succes = (df_janvier['Statut'] == 'Succès').mean() * 100
+success_rate = taux_succes
+failure_rate = 100 - success_rate
+sizes = [success_rate, failure_rate]
 
 # Paramètres 3D
 def func(pct, allvalues):
