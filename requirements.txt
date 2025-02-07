@@ -7,4 +7,3 @@ openpyxl
 reportlab
 xlsxwriter
 plotly
-matplotlib.pyplot
