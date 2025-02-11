@@ -127,8 +127,9 @@ st.title("Analyse des pointages")
 # Ajouter un widget pour télécharger le fichier Excel
 
 fichier_principal = "https://docs.google.com/spreadsheets/d/152ktjGubNDIr1PPG04mqJwZf9mhYTHmQ/export?format=xlsx"
-uploaded_file = "https://docs.google.com/spreadsheets/d/152ktjGubNDIr1PPG04mqJwZf9mhYTHmQ/export?format=xlsx"
-df = charger_donnees(fichier_principal)
+uploaded_file = pd.read_excel("https://docs.google.com/spreadsheets/d/152ktjGubNDIr1PPG04mqJwZf9mhYTHmQ/export?format=xlsx")
+da = charger_donnees(fichier_principal)
+df = load_data(uploaded_file)
 
 # Titre de l'application
 st.title("Répartition des Durées Totales par Employé")
