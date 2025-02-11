@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import io
+import plotly.graph_objects as go
+import plotly.express as px
 
 # Fonction pour calculer la durée de travail
 def calculer_duree_travail(entree, sortie):
@@ -115,6 +117,58 @@ st.title("Analyse des pointages")
 uploaded_file = st.file_uploader("Choisissez un fichier Excel", type="xlsx")
 df = load_data(uploaded_file)
 
+st.set_page_config(page_title="Durées Totales par Employé", layout="wide")
+
+# Titre de l'application
+st.title("Répartition des Durées Totales par Employé")
+# Tri des données
+
+# Afficher les opérateurs avec leurs entrées/sorties
+result = get_entry_exit_times(df)
+st.subheader("Opérateurs avec entrées/sorties et durées total mensuelles")
+resultat = result.groupby('Prénom et nom')['Durée (heures)'].sum().reset_index()
+resultat = resultat.rename(columns={'Durée (heures)':'Durée Mensuelle Total'})
+df_sorted = resultat.sort_values('Durée Total', ascending=False)
+
+# Création de la palette de couleurs
+color_scale = px.colors.sequential.Viridis
+
+# Création du treemap
+fig = go.Figure(go.Treemap(
+    labels=df_sorted['Prénom et nom'],
+    parents=[""] * len(df_sorted),
+    values=df_sorted['Durée Total'],
+    textinfo="label+value",
+    hovertemplate='<b>%{label}</b><br>Durée Totale: %{value:.2f} heures<extra></extra>',
+    marker=dict(
+        colorscale=color_scale,
+        colors=df_sorted['Durée Total'],
+        colorbar=dict(title="Durée<br>Totale"),
+    ),
+))
+
+# Personnalisation du layout
+fig.update_layout(
+    title={
+        'text': "Répartition des Durées Totales par Employé",
+        'y':0.95,
+        'x':0.5,
+        'xanchor': 'center',
+        'yanchor': 'top',
+        'font': dict(size=24)
+    },
+    width=1000,
+    height=800,
+)
+
+# Affichage du graphique dans Streamlit
+st.plotly_chart(fig, use_container_width=True)
+
+# Ajout d'une section pour afficher les données brutes
+if st.checkbox("Afficher les données brutes"):
+    st.write(df)
+
+
 if uploaded_file is not None:
     # Charger les données depuis le fichier téléchargé
     df = load_data(uploaded_file)
@@ -127,8 +181,9 @@ if uploaded_file is not None:
 
         # Afficher les opérateurs avec leurs entrées/sorties
         result = get_entry_exit_times(df)
-        st.subheader("Opérateurs avec entrées/sorties et durées correspondantes")
+        st.subheader("Opérateurs avec entrées/sorties et durées total mensuelles")
         resultat = result.groupby('Prénom et nom')['Durée (heures)'].sum().reset_index()
+        resultat = resultat.rename(columns={'Durée (heures)':'Durée Mensuelle Total'})
         st.write(resultat)
         
     else:
