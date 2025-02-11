@@ -14,53 +14,36 @@ st.title("Calendrier des Congés 2025")
 def load_data(file_path):
     # Utiliser pandas pour lire le fichier Excel
     try:
-        data = pd.read_excel(file_path)
+        df = pd.read_excel(file_path)
     except Exception as e:
         st.error(f"Erreur lors de la lecture du fichier Excel : {e}")
         return None
 
-    # Diviser les données en blocs pour chaque employé
-    employee_blocks = data.split('\n\n')
+    # Afficher les noms de colonnes pour le débogage
+    print("Noms des colonnes dans le fichier Excel:", df.columns)
 
-    # Initialiser une liste pour stocker les données
-    data_list = []
+    # Renommer les colonnes pour correspondre aux noms attendus
+    df.rename(columns={
+        'Prénom et nom': 'Prénom et nom',
+        'Type': 'Type',
+        'Type de congé': 'Type de congé',
+        'Début': 'Début',
+        'Fin': 'Fin',
+        'Succursale': 'Succursale',
+        'Position': 'Position',
+        'Ressources': 'Ressources',
+        'Total (h)': 'Total (h)',
+        'Note': 'Note',
+        '# de la demande': '# de la demande',
+        'Créée le': 'Créée le',
+        'Approuvé à': 'Approuvé à',
+        'Approbateur': 'Approbateur',
+        'Justification': 'Justification'
+    }, inplace=True)
 
-    # Parcourir chaque bloc d'employé
-    for block in employee_blocks:
-        # Ignorer les blocs vides
-        if not block.strip():
-            continue
-
-        # Extraire le nom de l'employé (première ligne)
-        lines = block.splitlines()
-        employee_name = lines[0].strip()
-
-        # Trouver la ligne d'en-tête du tableau
-        header_line = next((line for line in lines if 'Type' in line and 'Début' in line and 'Fin' in line), None)
-        if not header_line:
-            continue
-
-        header = [h.strip() for h in header_line.split('\t')]
-        header = [h for h in header if h]  # Nettoyer les en-têtes vides
-
-        # Extraire les données des congés
-        for line in lines[lines.index(header_line) + 1:]:
-            if 'Total' in line:
-                continue
-            values = [v.strip() for v in line.split('\t')]
-            values = [v for v in values if v]  # Nettoyer les valeurs vides
-            
-            # S'assurer que le nombre de valeurs correspond au nombre d'en-têtes
-            if len(values) == len(header):
-                entry = dict(zip(header, values))
-                entry['Prénom et nom'] = employee_name  # Ajouter le nom de l'employé
-                data_list.append(entry)
-
-    # Créer le DataFrame
-    df = pd.DataFrame(data_list)
     return df
 
-# Charger les données depuis le fichier Excel
+# URL de la feuille de calcul Google Sheets
 file_path = "https://docs.google.com/spreadsheets/d/1IO_1-v5i0IZQSF6UUfYEuKlTn6i-3hSI/export?format=xlsx"
 df = load_data(file_path)
 
