@@ -117,8 +117,6 @@ st.title("Analyse des pointages")
 uploaded_file = st.file_uploader("Choisissez un fichier Excel", type="xlsx")
 df = load_data(uploaded_file)
 
-st.set_page_config(page_title="Durées Totales par Employé", layout="wide")
-
 # Titre de l'application
 st.title("Répartition des Durées Totales par Employé")
 # Tri des données
