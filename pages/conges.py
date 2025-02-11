@@ -29,7 +29,7 @@ def load_data(file_path):
     return df
 
 # Charger les données depuis le fichier Excel
-file_path = "https://docs.google.com/spreadsheets/d/1zdp_Ub3RHTF9m9WYkddnwQrOz4woWjly/export?format=xlsx"
+file_path = "https://docs.google.com/spreadsheets/d/1IO_1-v5i0IZQSF6UUfYEuKlTn6i-3hSI/export?format=xlsx"
 df = load_data(file_path)
 
 # Vérifier si le DataFrame a été chargé correctement
