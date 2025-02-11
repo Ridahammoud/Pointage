@@ -30,7 +30,7 @@ def load_data(file_path):
 
 
 # Charger les données depuis le fichier Excel
-file_path = "paste.xlsx"
+file_path = pd.read_excel("https://docs.google.com/spreadsheets/d/1zdp_Ub3RHTF9m9WYkddnwQrOz4woWjly/export?format=xlsx")
 df = load_data(file_path)
 
 # Vérifier si le DataFrame a été chargé correctement
