@@ -7,57 +7,36 @@ from datetime import datetime, timedelta
 st.set_page_config(page_title="Congés 2025", layout="wide")
 st.title("Calendrier des Congés 2025")
 
-# Fonction pour charger les données depuis le fichier texte
+# Fonction pour charger les données depuis le fichier Excel
 @st.cache_data
 def load_data(file_path):
-    with open(file_path, 'r', encoding='utf-8') as f:
-        data = f.read()
+    # Utiliser pandas pour lire le fichier Excel
+    try:
+        df = pd.read_excel(file_path)
+    except Exception as e:
+        st.error(f"Erreur lors de la lecture du fichier Excel : {e}")
+        return None
 
-    # Diviser les données en blocs pour chaque employé
-    employee_blocks = data.split('\n\n')
+    # Renommer les colonnes pour correspondre aux noms attendus
+    df.rename(columns={
+        'Type': 'Type',
+        'Type de congé': 'Type de congé',
+        'Début': 'Début',
+        'Fin': 'Fin',
+        'Justification': 'Justification'
+    }, inplace=True)
 
-    # Initialiser une liste pour stocker les données
-    data_list = []
-
-    # Parcourir chaque bloc d'employé
-    for block in employee_blocks:
-        # Ignorer les blocs vides
-        if not block.strip():
-            continue
-
-        # Extraire le nom de l'employé (première ligne)
-        lines = block.splitlines()
-        employee_name = lines[0].strip()
-
-        # Trouver la ligne d'en-tête du tableau
-        header_line = next((line for line in lines if 'Type' in line and 'Début' in line and 'Fin' in line), None)
-        if not header_line:
-            continue
-
-        header = [h.strip() for h in header_line.split('\t')]
-        header = [h for h in header if h]  # Nettoyer les en-têtes vides
-
-        # Extraire les données des congés
-        for line in lines[lines.index(header_line) + 1:]:
-            if 'Total' in line:
-                continue
-            values = [v.strip() for v in line.split('\t')]
-            values = [v for v in values if v]  # Nettoyer les valeurs vides
-            
-            # S'assurer que le nombre de valeurs correspond au nombre d'en-têtes
-            if len(values) == len(header):
-                entry = dict(zip(header, values))
-                entry['Prénom et nom'] = employee_name  # Ajouter le nom de l'employé
-                data_list.append(entry)
-
-    # Créer le DataFrame
-    df = pd.DataFrame(data_list)
     return df
 
 
-# Chemin vers le fichier texte (à remplacer par votre chemin réel)
-file_path = "paste.txt"
+# Charger les données depuis le fichier Excel
+file_path = "paste.xlsx"
 df = load_data(file_path)
+
+# Vérifier si le DataFrame a été chargé correctement
+if df is None or df.empty:
+    st.warning("Aucune donnée à afficher.")
+    st.stop()
 
 # Convertir les colonnes 'Début' et 'Fin' en datetime
 df['Début'] = pd.to_datetime(df['Début'], errors='coerce')
