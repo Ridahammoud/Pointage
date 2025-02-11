@@ -113,7 +113,7 @@ def create_monthly_calendar(year, month, data):
                     color = 'lightgray'
                     
                 # Add a circle for each day
-                circle = plt.Circle((j/7 + 1/14), 0.1, color=color, linewidth=1, edgecolor='black', alpha=0.7, transform=ax.transAxes)
+                circle = plt.Circle((j/7 + 1/14), (0.8 - (i/7 + 0.07)), 0.1, color=color, linewidth=1, edgecolor='black', alpha=0.7, transform=ax.transAxes)
                 ax.add_patch(circle)
                 
                 # Add the day number
