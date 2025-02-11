@@ -128,8 +128,8 @@ st.title("Analyse des pointages")
 
 fichier_principal = "https://docs.google.com/spreadsheets/d/152ktjGubNDIr1PPG04mqJwZf9mhYTHmQ/export?format=xlsx"
 uploaded_file = pd.read_excel("https://docs.google.com/spreadsheets/d/152ktjGubNDIr1PPG04mqJwZf9mhYTHmQ/export?format=xlsx")
-da = charger_donnees(fichier_principal)
-df = load_data(uploaded_file)
+df = charger_donnees(fichier_principal)
+df['Date et heure'] = pd.to_datetime(df['Date et heure'], errors='coerce')
 
 # Titre de l'application
 st.title("Répartition des Durées Totales par Employé")
@@ -181,9 +181,9 @@ if st.checkbox("Afficher les données brutes"):
     st.write(df)
 
 
-if uploaded_file is not None:
+if fichier_principal is not None:
     # Charger les données depuis le fichier téléchargé
-    df = load_data(fichier_principal)
+    df = charger_donnees(fichier_principal)
     
     if df is not None:
         st.success("Données chargées avec succès !")
