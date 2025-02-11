@@ -61,9 +61,32 @@ def create_monthly_calendar(year, month, data):
     # Créer le graphique du calendrier
     fig, ax = plt.subplots(figsize=(10, 7))
     ax.set_xlim(0, 7)
-    ax.set_ylim(0, len(days_in_month) // 7 + 1)
-    
-    # Ajouter les jours au calendrier
+    ax.set_ylim(0, (len(days_in_month) // 7) + 1)
+
+    # Afficher les semaines du mois
+    week_days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
+    for i, day_name in enumerate(week_days):
+        ax.text(i + 0.5, 0.95, day_name, ha='center', va='center', fontsize=12, weight='bold')
+
+    # Afficher les jours du mois
     for i, week in enumerate(cal.monthdayscalendar(year, month)):
         for j, day in enumerate(week):
-            create_monthly_calendar(2025, month, df)
+            if day != 0:  # Ignorer les jours vides
+                ax.add_patch(plt.Rectangle((j, (i + 1) * 0.9), 1, 1, facecolor='lightgray', edgecolor='black'))
+                ax.text(j + 0.5, (i + 1) * 0.9 + 0.5, str(day), ha='center', va='center', fontsize=10)
+                
+                # Afficher le nombre d'événements
+                if day in day_events and day_events[day] > 0:
+                    ax.text(j + 0.5, (i + 1) * 0.9 + 0.2, f'{day_events[day]}', ha='center', va='center', fontsize=8, color='red')
+
+    # Ajuster l'aspect
+    ax.set_aspect('equal', 'box')
+    plt.axis('off')
+    st.pyplot(fig)
+
+# Sélectionner le mois à afficher
+month = st.selectbox("Choisissez le mois", list(calendar.month_name[1:]), index=0)
+month_number = list(calendar.month_name).index(month)
+
+# Afficher le calendrier pour le mois choisi
+create_monthly_calendar(2025, month_number, df)
