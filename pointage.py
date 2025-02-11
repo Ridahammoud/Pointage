@@ -125,7 +125,7 @@ st.title("Répartition des Durées Totales par Employé")
 result = get_entry_exit_times(df)
 st.subheader("Opérateurs avec entrées/sorties et durées total mensuelles")
 resultat = result.groupby('Prénom et nom')['Durée (heures)'].sum().reset_index()
-resultat = resultat.rename(columns={'Durée (heures)':'Durée Mensuelle Total'})
+resultat = resultat.rename(columns={'Durée (heures)':'Durée Total'})
 df_sorted = resultat.sort_values('Durée Total', ascending=False)
 
 # Création de la palette de couleurs
