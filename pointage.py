@@ -143,13 +143,13 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Opérateurs ayant pointé correctement")
-    for operateur in operateurs_corrects:
-        st.write(f"- {operateur}")
+    for operateur in operateurs_corrects:        
+        st.write(", ".join(operateur))
 
 with col2:
     st.subheader("Opérateurs n'ayant pas pointé correctement")
     for operateur in operateurs_incorrects:
-        st.write(f"- {operateur}")
+        st.write(", ".join(operateur))
         
 # Filtrer les données pour janvier 2025
 df_janvier = df[df['Date et heure'].dt.month == 1]
