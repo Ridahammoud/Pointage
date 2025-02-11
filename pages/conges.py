@@ -69,15 +69,6 @@ def create_monthly_calendar(year, month, data):
     # Afficher le calendrier avec style
     st.dataframe(
         calendar_df,
-        column_config={
-            "Lundi": st.column_config.DataColumn(width="medium"),
-            "Mardi": st.column_config.DataColumn(width="medium"),
-            "Mercredi": st.column_config.DataColumn(width="medium"),
-            "Jeudi": st.column_config.DataColumn(width="medium"),
-            "Vendredi": st.column_config.DataColumn(width="medium"),
-            "Samedi": st.column_config.DataColumn(width="medium"),
-            "Dimanche": st.column_config.DataColumn(width="medium"),
-        },
         height=(len(cal) + 1) * 80,  # Ajuster la hauteur en fonction du nombre de semaines
     )
 
