@@ -48,7 +48,7 @@ df = df[(df['Début'].dt.year == 2025) | (df['Fin'].dt.year == 2025)]
 def create_interactive_calendar(year, data):
     # On crée un tableau de données avec chaque jour de l'année
     days = pd.date_range(start=f"{year}-01-01", end=f"{year}-12-31", freq='D')
-    day_events = {day: 0 for day in days}
+    day_events = {day.date(): 0 for day in days}  # Initialiser day_events avec des dates de type datetime.date
     
     # Comptabiliser les congés par jour
     for _, row in data.iterrows():
@@ -57,14 +57,15 @@ def create_interactive_calendar(year, data):
         
         for day in pd.date_range(start=start_date, end=end_date, freq='D'):
             if day.year == year:
-                day_events[day] += 1
+                day_events[day.date()] += 1  # Utiliser .date() pour garantir que day est de type datetime.date
 
     # Créer les couleurs pour chaque jour
     colors = []
     for day in days:
-        if day_events[day] > 3:
+        day_key = day.date()  # Utiliser .date() pour le comparer avec les clés dans day_events
+        if day_events[day_key] > 3:
             colors.append('red')
-        elif day_events[day] > 0:
+        elif day_events[day_key] > 0:
             colors.append('green')
         else:
             colors.append('gray')
@@ -77,7 +78,7 @@ def create_interactive_calendar(year, data):
         x=days, y=[0] * len(days),
         mode='markers',
         marker=dict(color=colors, size=15),
-        hovertext=[f"{day.strftime('%Y-%m-%d')}: {day_events[day]} congé(s)" for day in days],
+        hovertext=[f"{day.strftime('%Y-%m-%d')}: {day_events[day.date()]} congé(s)" for day in days],
         hoverinfo="text"
     ))
 
