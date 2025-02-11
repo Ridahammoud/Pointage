@@ -128,7 +128,8 @@ if uploaded_file is not None:
         # Afficher les opérateurs avec leurs entrées/sorties
         result = get_entry_exit_times(df)
         st.subheader("Opérateurs avec entrées/sorties et durées correspondantes")
-        st.write(result)
+        resultat = result.groupby('Prénom et nom')['Durée (heures)'].sum().reset_index()
+        st.write(resultat)
         
     else:
         st.error("Impossible de charger les données. Vérifiez le fichier.")
