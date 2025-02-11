@@ -1,8 +1,9 @@
 import streamlit as st
 import pandas as pd
+import plotly.graph_objects as go
 import calendar
 from datetime import datetime, timedelta
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Calendrier des Congés 2025", layout="wide")
@@ -43,50 +44,81 @@ df['Fin'] = pd.to_datetime(df['Fin'], errors='coerce')
 # Filtrer les congés pour l'année 2025
 df = df[(df['Début'].dt.year == 2025) | (df['Fin'].dt.year == 2025)]
 
-# Fonction pour créer un calendrier mensuel avec les événements
-def create_monthly_calendar(year, month, data):
-    cal = calendar.Calendar(firstweekday=calendar.MONDAY)
-    days_in_month = [day for day in cal.itermonthdays(year, month) if day != 0]
+# Fonction pour créer un calendrier interactif
+def create_interactive_calendar(year, data):
+    # On crée un tableau de données avec chaque jour de l'année
+    days = pd.date_range(start=f"{year}-01-01", end=f"{year}-12-31", freq='D')
+    day_events = {day: 0 for day in days}
     
-    # Préparer les données par jour
-    day_events = {day: 0 for day in days_in_month}
+    # Comptabiliser les congés par jour
     for _, row in data.iterrows():
-        start_date = max(row['Début'].date(), datetime(year, month, 1).date())
-        end_date = min(row['Fin'].date(), datetime(year, month, calendar.monthrange(year, month)[1]).date())
-        for day in range((end_date - start_date).days + 1):
-            current_day = (start_date + timedelta(days=day)).day
-            if current_day in day_events:
-                day_events[current_day] += 1
+        start_date = row['Début']
+        end_date = row['Fin']
+        
+        for day in pd.date_range(start=start_date, end=end_date, freq='D'):
+            if day.year == year:
+                day_events[day] += 1
 
-    # Créer le graphique du calendrier
-    fig, ax = plt.subplots(figsize=(10, 7))
-    ax.set_xlim(0, 7)
-    ax.set_ylim(0, (len(days_in_month) // 7) + 1)
+    # Créer les couleurs pour chaque jour
+    colors = []
+    for day in days:
+        if day_events[day] > 3:
+            colors.append('red')
+        elif day_events[day] > 0:
+            colors.append('green')
+        else:
+            colors.append('gray')
 
-    # Afficher les semaines du mois
-    week_days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
-    for i, day_name in enumerate(week_days):
-        ax.text(i + 0.5, 0.95, day_name, ha='center', va='center', fontsize=12, weight='bold')
+    # Création de la figure Plotly
+    fig = go.Figure()
 
-    # Afficher les jours du mois
-    for i, week in enumerate(cal.monthdayscalendar(year, month)):
-        for j, day in enumerate(week):
-            if day != 0:  # Ignorer les jours vides
-                ax.add_patch(plt.Rectangle((j, (i + 1) * 0.9), 1, 1, facecolor='lightgray', edgecolor='black'))
-                ax.text(j + 0.5, (i + 1) * 0.9 + 0.5, str(day), ha='center', va='center', fontsize=10)
-                
-                # Afficher le nombre d'événements
-                if day in day_events and day_events[day] > 0:
-                    ax.text(j + 0.5, (i + 1) * 0.9 + 0.2, f'{day_events[day]}', ha='center', va='center', fontsize=8, color='red')
+    # Ajout des jours au calendrier
+    fig.add_trace(go.Scatter(
+        x=days, y=[0] * len(days),
+        mode='markers',
+        marker=dict(color=colors, size=15),
+        hovertext=[f"{day.strftime('%Y-%m-%d')}: {day_events[day]} congé(s)" for day in days],
+        hoverinfo="text"
+    ))
 
-    # Ajuster l'aspect
-    ax.set_aspect('equal', 'box')
-    plt.axis('off')
-    st.pyplot(fig)
+    # Mise en forme du calendrier
+    fig.update_layout(
+        title=f"Calendrier des Congés {year}",
+        xaxis=dict(
+            tickvals=pd.to_datetime([f"{year}-{i:02d}-01" for i in range(1, 13)]),
+            ticktext=[calendar.month_name[i] for i in range(1, 13)],
+            title="Mois",
+            showgrid=False
+        ),
+        yaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            title="Jours"
+        ),
+        showlegend=False,
+        plot_bgcolor="white",
+        height=600
+    )
 
-# Sélectionner le mois à afficher
-month = st.selectbox("Choisissez le mois", list(calendar.month_name[1:]), index=0)
-month_number = list(calendar.month_name).index(month)
+    return fig
 
-# Afficher le calendrier pour le mois choisi
-create_monthly_calendar(2025, month_number, df)
+# Créer un calendrier interactif pour l'année 2025
+fig = create_interactive_calendar(2025, df)
+
+# Afficher le graphique interactif
+st.plotly_chart(fig)
+
+# Détails du congé sélectionné
+st.subheader("Détails des Congés")
+selected_date = st.date_input("Sélectionner une date", min_value=datetime(2025, 1, 1), max_value=datetime(2025, 12, 31))
+selected_day_conges = df[(df['Début'].dt.date <= selected_date) & (df['Fin'].dt.date >= selected_date)]
+
+if selected_day_conges.empty:
+    st.write(f"Aucun congé programmé pour le {selected_date}.")
+else:
+    for _, row in selected_day_conges.iterrows():
+        st.write(f"**Nom**: {row['Prénom et nom']}")
+        st.write(f"**Type de congé**: {row['Type de congé']}")
+        st.write(f"**Justification**: {row['Justification']}")
+        st.write(f"**Période**: {row['Début'].strftime('%Y-%m-%d')} à {row['Fin'].strftime('%Y-%m-%d')}")
+        st.write("---")
