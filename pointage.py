@@ -5,6 +5,12 @@ from datetime import datetime, timedelta
 import io
 import plotly.graph_objects as go
 import plotly.express as px
+from io import BytesIO
+import xlsxwriter
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import os
+
 
 # Fonction pour calculer la durée de travail
 def calculer_duree_travail(entree, sortie):
