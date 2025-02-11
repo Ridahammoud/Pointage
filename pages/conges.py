@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import calendar
 from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
 # Configuration de la page Streamlit
 st.set_page_config(page_title="Congés 2025", layout="wide")
@@ -44,34 +46,65 @@ df['Fin'] = pd.to_datetime(df['Fin'], errors='coerce')
 # Filtrer les congés pour l'année 2025
 df = df[df['Début'].dt.year == 2025]
 
-# Fonction pour créer le calendrier mensuel
+# Function to create a monthly calendar with event counts
 def create_monthly_calendar(year, month, data):
-    cal = calendar.monthcalendar(year, month)
+    cal = calendar.Calendar(firstweekday=calendar.MONDAY)
+    month_days = [n for n in cal.itermonthdays(year, month)]
+    
+    # Count events per day
+    day_events = {}
+    for day in range(1, calendar.monthrange(year, month)[1] + 1):
+        date = datetime(year, month, day).date()
+        day_events[day] = len(data[(data['Début'].dt.date <= date) & (data['Fin'].dt.date >= date)])
+    
+    # Setup the plot
+    fig, ax = plt.subplots(figsize=(10, 7))
+    ax.set_aspect('equal')
+
+    # Month and Year title
     month_name = calendar.month_name[month]
-    st.subheader(f"{month_name} {year}")
+    ax.set_title(f"{month_name} {year}", fontsize=16, fontweight='bold')
 
-    # Créer un DataFrame pour le calendrier
-    calendar_data = []
-    for week in cal:
-        week_data = []
-        for day in week:
-            if day == 0:
-                week_data.append("")
-            else:
-                date = datetime(year, month, day)
-                day_events = data[(data['Début'] <= date) & (data['Fin'] >= date)]
-                events_text = "<br>".join([f"{row['Prénom et nom']} ({row['Type de congé']}): {row['Justification']}" for _, row in day_events.iterrows()])
-                week_data.append(f"{day}<br>{events_text}")
-        calendar_data.append(week_data)
+    # Hide spines and ticks
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.tick_params(axis='both', which='both', length=0)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    
+    # Add day labels
+    day_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    for i, day in enumerate(day_names):
+        ax.text((i/7) + (1/14), 0.9, day, ha='center', va='center', fontsize=12, color='dimgray')
+    
+    # Add the calendar days
+    start_day = month_days[0]
+    weeks = [month_days[i:i+7] for i in range(0, len(month_days), 7)]
+    
+    for i, week in enumerate(weeks):
+        for j, day in enumerate(week):
+            if day != 0:
+                date = datetime(year, month, day).date()
+                
+                # Determine the color based on the event count
+                event_count = day_events[day]
+                if event_count > 3:
+                    color = 'red'
+                elif 1 <= event_count <= 3:
+                    color = 'forestgreen'
+                else:
+                    color = 'lightgray'
+                    
+                # Add a circle for each day
+                circle = plt.Circle(((j)/7 + (1/14)), 0.1, color=color, linewidth=1, edgecolor='black', alpha=0.7)
+                ax.add_patch(circle)
+                
+                # Add the day number
+                ax.text((j/7 + (1/14)), (0.8 - (i/7 + 0.07)), str(day), ha='center', va='center', fontsize=10, color='black')
 
-    calendar_df = pd.DataFrame(calendar_data, columns=['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'])
-
-    # Afficher le calendrier avec style
-    st.dataframe(
-        calendar_df,
-        height=(len(cal) + 1) * 80,  # Ajuster la hauteur en fonction du nombre de semaines
-    )
-
+    st.pyplot(fig)  # Display the Matplotlib figure in Streamlit
 
 # Afficher les calendriers mensuels pour toute l'année 2025
 for month in range(1, 13):
