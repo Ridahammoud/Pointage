@@ -66,3 +66,4 @@ def create_monthly_calendar(year, month, data):
     # Ajouter les jours au calendrier
     for i, week in enumerate(cal.monthdayscalendar(year, month)):
         for j, day in enumerate(week):
+            create_monthly_calendar(2025, month, df)
