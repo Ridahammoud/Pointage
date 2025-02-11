@@ -12,33 +12,35 @@ st.title("Calendrier des Congés 2025")
 # Fonction pour charger les données depuis le fichier texte
 @st.cache_data
 def load_data(file_path):
-    # Utiliser pandas pour lire le fichier Excel
     try:
         df = pd.read_excel(file_path)
     except Exception as e:
         st.error(f"Erreur lors de la lecture du fichier Excel : {e}")
         return None
 
+    # Convertir les noms de colonnes en minuscules et remplacer les espaces par des underscores
+    df.columns = [col.lower().replace(' ', '_') for col in df.columns]
+
     # Afficher les noms de colonnes pour le débogage
     print("Noms des colonnes dans le fichier Excel:", df.columns)
 
     # Renommer les colonnes pour correspondre aux noms attendus
     df.rename(columns={
-        'Prénom et nom': 'Prénom et nom',
-        'Type': 'Type',
-        'Type de congé': 'Type de congé',
-        'Début': 'Début',
-        'Fin': 'Fin',
-        'Succursale': 'Succursale',
-        'Position': 'Position',
-        'Ressources': 'Ressources',
-        'Total (h)': 'Total (h)',
-        'Note': 'Note',
-        '# de la demande': '# de la demande',
-        'Créée le': 'Créée le',
-        'Approuvé à': 'Approuvé à',
-        'Approbateur': 'Approbateur',
-        'Justification': 'Justification'
+        'prénom_et_nom': 'Prénom et nom',
+        'type': 'Type',
+        'type_de_congé': 'Type de congé',
+        'début': 'Début',
+        'fin': 'Fin',
+        'succursale': 'Succursale',
+        'position': 'Position',
+        'ressources': 'Ressources',
+        'total_(h)': 'Total (h)',
+        'note': 'Note',
+        '#_de_la_demande': '# de la demande',
+        'créée_le': 'Créée le',
+        'approuvé_à': 'Approuvé à',
+        'approbateur': 'Approbateur',
+        'justification': 'Justification'
     }, inplace=True)
 
     return df
