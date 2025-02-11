@@ -17,6 +17,11 @@ def calculer_duree_travail(entree, sortie):
     duree = (fin - debut)
     return duree
 
+# Fonction de chargement des données
+@st.cache_data
+def charger_donnees(fichier):
+    return pd.read_excel(fichier)
+
 # Chargement des données
 @st.cache_data
 def load_data(uploaded_file):
@@ -114,8 +119,9 @@ def get_entry_exit_times(df):
 st.title("Analyse des pointages")
 
 # Ajouter un widget pour télécharger le fichier Excel
-uploaded_file = st.file_uploader("Choisissez un fichier Excel", type="xlsx")
-df = load_data(uploaded_file)
+
+fichier_principal = "https://docs.google.com/spreadsheets/d/152ktjGubNDIr1PPG04mqJwZf9mhYTHmQ/export?format=xlsx"
+df = charger_donnees(fichier_principal)
 
 # Titre de l'application
 st.title("Répartition des Durées Totales par Employé")
