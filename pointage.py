@@ -155,44 +155,48 @@ with col2:
 # Filtrer les données pour janvier 2025
 df_janvier = df[df['Date et heure'].dt.month == 1]
 
-# Nombre total de pointages par jour
-st.header("Nombre total de pointages par jour")
-df_janvier['Date'] = pd.to_datetime(df_janvier['Date et heure']).dt.date
-pointages_par_jour = df_janvier.groupby('Date').size()
-st.bar_chart(pointages_par_jour)
+col3, col4 = st.columns(2)
 
-# Calculer le taux de succès
-total_actions = len(df)
-actions_succes = len(df[df['Statut'] == 'Succès'])
-success_rate = (actions_succes / total_actions) * 100
-failure_rate = 100 - success_rate
+with col3:
+    # Nombre total de pointages par jour
+    st.header("Nombre total de pointages par jour")
+    df_janvier['Date'] = pd.to_datetime(df_janvier['Date et heure']).dt.date
+    pointages_par_jour = df_janvier.groupby('Date').size()
+    st.bar_chart(pointages_par_jour)
 
-# Création du camembert 3D
-fig, ax = plt.subplots(figsize=(8, 6), subplot_kw=dict(projection='3d'))
+with col4:
+    # Calculer le taux de succès
+    total_actions = len(df)
+    actions_succes = len(df[df['Statut'] == 'Succès'])
+    success_rate = (actions_succes / total_actions) * 100
+    failure_rate = 100 - success_rate
 
-# Taux de succès
-st.header("Taux de succès")
-taux_succes = (df_janvier['Statut'] == 'Succès').mean() * 100
-# Données du taux de succès
-success_rate = taux_succes
-failure_rate = 100 - success_rate
+    # Création du camembert 3D
+    fig, ax = plt.subplots(figsize=(8, 6), subplot_kw=dict(projection='3d'))
 
-# Création du camembert
-fig, ax = plt.subplots()
-sizes = [success_rate, failure_rate]
-labels = ['Succès', 'Échec']
-colors = ['#4CAF50', '#F44336']
-ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
-ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle
+    # Taux de succès
+    st.header("Taux de succès")
+    taux_succes = (df_janvier['Statut'] == 'Succès').mean() * 100
+    # Données du taux de succès
+    success_rate = taux_succes
+    failure_rate = 100 - success_rate
 
-# Titre du graphique
-plt.title("Taux de succès des pointages")
+    # Création du camembert
+    fig, ax = plt.subplots()
+    sizes = [success_rate, failure_rate]
+    labels = ['Succès', 'Échec']
+    colors = ['#4CAF50', '#F44336']
+    ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle
 
-# Affichage du camembert dans Streamlit
-st.pyplot(fig)
+    # Titre du graphique
+    plt.title("Taux de succès des pointages")
 
-result = get_entry_exit_times(df)
-print(result)
+    # Affichage du camembert dans Streamlit
+    st.pyplot(fig)
+
+    result = get_entry_exit_times(df)
+    print(result)
 
 # Observations particulières
 st.header("Observations particulières")
