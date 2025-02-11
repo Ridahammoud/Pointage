@@ -127,6 +127,7 @@ st.title("Analyse des pointages")
 # Ajouter un widget pour télécharger le fichier Excel
 
 fichier_principal = "https://docs.google.com/spreadsheets/d/152ktjGubNDIr1PPG04mqJwZf9mhYTHmQ/export?format=xlsx"
+uploaded_file = "https://docs.google.com/spreadsheets/d/152ktjGubNDIr1PPG04mqJwZf9mhYTHmQ/export?format=xlsx"
 df = charger_donnees(fichier_principal)
 
 # Titre de l'application
