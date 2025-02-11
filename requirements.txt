@@ -7,4 +7,3 @@ reportlab
 xlsxwriter
 plotly
 matplotlib
-calendar
